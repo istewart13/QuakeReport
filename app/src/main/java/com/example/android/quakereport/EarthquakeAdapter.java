@@ -15,6 +15,9 @@ import java.util.Date;
 
 public class EarthquakeAdapter extends ArrayAdapter<Earthquake> {
 
+    // pattern to match one or more digits at start of string
+    private static final String REGEX_DIGIT_PATTERN = "\\d+(.*)";
+
     public EarthquakeAdapter(@NonNull Context context, ArrayList<Earthquake> earthquakes) {
         super(context, 0, earthquakes);
     }
@@ -32,8 +35,14 @@ public class EarthquakeAdapter extends ArrayAdapter<Earthquake> {
         TextView magnitudeTextView = (TextView) listItemView.findViewById(R.id.magnitude);
         magnitudeTextView.setText(currentEarthquake.getMagnitude());
 
-        TextView locationTextView = (TextView) listItemView.findViewById(R.id.location);
-        locationTextView.setText(currentEarthquake.getLocation());
+        TextView offsetTextView = (TextView) listItemView.findViewById(R.id.offset);
+        boolean offsetExists = locationContainsDigit(currentEarthquake.getLocation());
+        String offset = createOffset(currentEarthquake.getLocation(), offsetExists);
+        offsetTextView.setText(offset);
+
+        TextView locationTextView = (TextView) listItemView.findViewById(R.id.primary_location);
+        String primaryLocation = createPrimaryLocation(currentEarthquake.getLocation(), offsetExists);
+        locationTextView.setText(primaryLocation);
 
         Date dateObject = new Date(currentEarthquake.getTimeMilliseconds());
 
@@ -62,6 +71,36 @@ public class EarthquakeAdapter extends ArrayAdapter<Earthquake> {
     private String formatTime(Date dateObject) {
         SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm a");
         return timeFormat.format(dateObject);
+    }
 
+    /**
+     * Return whether location string contains one or more numerical digits
+     */
+    private boolean locationContainsDigit(String location) {
+        return location.matches(REGEX_DIGIT_PATTERN);
+    }
+
+    /**
+     * Return offset string
+     */
+    private String createOffset(String location, boolean offsetExists) {
+        if (offsetExists) {
+            int lastIndexOfOffset = location.indexOf('f');
+            return location.substring(0, lastIndexOfOffset + 1);
+        } else {
+            return getContext().getString(R.string.near_the);
+        }
+    }
+
+    /**
+     * Return primary location string
+     */
+    private String createPrimaryLocation(String location, boolean offsetExists) {
+        if (offsetExists) {
+            int lastIndexOfOffset = location.indexOf('f');
+            return location.substring(lastIndexOfOffset + 2);
+        } else {
+            return location;
+        }
     }
 }
