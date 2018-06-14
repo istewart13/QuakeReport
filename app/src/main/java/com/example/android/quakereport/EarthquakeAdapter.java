@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -33,7 +34,8 @@ public class EarthquakeAdapter extends ArrayAdapter<Earthquake> {
         Earthquake currentEarthquake = getItem(position);
 
         TextView magnitudeTextView = (TextView) listItemView.findViewById(R.id.magnitude);
-        magnitudeTextView.setText(currentEarthquake.getMagnitude());
+        String formattedMagnitude = formatMagnitude(currentEarthquake.getMagnitude());
+        magnitudeTextView.setText(formattedMagnitude);
 
         TextView offsetTextView = (TextView) listItemView.findViewById(R.id.offset);
         boolean offsetExists = locationContainsDigit(currentEarthquake.getLocation());
@@ -102,5 +104,10 @@ public class EarthquakeAdapter extends ArrayAdapter<Earthquake> {
         } else {
             return location;
         }
+    }
+
+    private String formatMagnitude(double magnitude) {
+        DecimalFormat decimalFormatter = new DecimalFormat("0.0");
+        return decimalFormatter.format(magnitude);
     }
 }
