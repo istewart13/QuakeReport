@@ -50,9 +50,9 @@ public class EarthquakeActivity extends AppCompatActivity {
 
         earthquakeListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                String earthQuakeUrl = adapter.getItem(i).getUrl();
-                Uri earthquakeUri = Uri.parse(earthQuakeUrl);
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                Earthquake currentEarthquake = adapter.getItem(position);
+                Uri earthquakeUri = Uri.parse(currentEarthquake.getUrl());
                 Intent intent = new Intent(Intent.ACTION_VIEW, earthquakeUri);
                 startActivity(intent);
             }
