@@ -41,10 +41,26 @@ public final class QueryUtils {
     }
 
     /**
+     * Query the USGS dataset and return a list of {@link Earthquake} objects.
+     */
+    public static List<Earthquake> fetchEarthquakeData(String requestUrl) {
+        URL url = createUrl(requestUrl);
+        String jsonResponse = null;
+        try {
+            jsonResponse = makeHttpRequest(url);
+        } catch (IOException e) {
+            Log.e(LOG_TAG, "Problem making the HTTP request.", e);
+        }
+
+        List<Earthquake> earthquakes = extractFeatureFromJSON(jsonResponse);
+        return earthquakes;
+    }
+
+    /**
      * Return a list of {@link Earthquake} objects that has been built up from
      * parsing a JSON response.
      */
-    public static List<Earthquake> extractFeatureFromJSON(String earthquakeJSON) {
+    private static List<Earthquake> extractFeatureFromJSON(String earthquakeJSON) {
         // If JSOn string is null or empty then return early
         if (TextUtils.isEmpty(earthquakeJSON)) {
             return null;
