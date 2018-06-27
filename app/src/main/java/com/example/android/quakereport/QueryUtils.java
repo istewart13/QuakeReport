@@ -1,5 +1,6 @@
 package com.example.android.quakereport;
 
+import android.text.TextUtils;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -17,6 +18,7 @@ import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Helper methods related to requesting and receiving earthquake data from USGS.
@@ -42,23 +44,24 @@ public final class QueryUtils {
      * Return a list of {@link Earthquake} objects that has been built up from
      * parsing a JSON response.
      */
-    public static ArrayList<Earthquake> extractEarthquakes() {
+    public static List<Earthquake> extractFeatureFromJSON(String earthquakeJSON) {
+        // If JSOn string is null or empty then return early
+        if (TextUtils.isEmpty(earthquakeJSON)) {
+            return null;
+        }
 
         // Create an empty ArrayList that we can start adding earthquakes to
-        ArrayList<Earthquake> earthquakes = new ArrayList<>();
+        List<Earthquake> earthquakes = new ArrayList<>();
 
         // Try to parse the SAMPLE_JSON_RESPONSE. If there's a problem with the way the JSON
         // is formatted, a JSONException exception object will be thrown.
         // Catch the exception so the app doesn't crash, and print the error message to the logs.
         try {
-            // COMPLETED: Parse the response given by the SAMPLE_JSON_RESPONSE string and
-            // build up a list of Earthquake objects with the corresponding data.
-
-            // Convert SAMPLE_JSON_RESPONSE String into a JSONObject
-            JSONObject sampleResponse = new JSONObject(SAMPLE_JSON_RESPONSE);
+            // Create a JSON object from the JSOn response string
+            JSONObject baseJsonResponse = new JSONObject(earthquakeJSON);
 
             // Extract “features” JSONArray
-            JSONArray features = sampleResponse.getJSONArray("features");
+            JSONArray features = baseJsonResponse.getJSONArray("features");
 
             // Loop through each feature in the array
             for (int i = 0; i < features.length(); i++) {
@@ -72,10 +75,12 @@ public final class QueryUtils {
                 String place = properties.getString("place");
                 // Extract the value for the key called "time"
                 long time = properties.getLong("time");
+                // Extract the calue for the key called 'url'
                 String url = properties.getString("url");
 
                 // Create Earthquake java object from magnitude, location, and time
                 Earthquake earthquake = new Earthquake(mag, place, time, url);
+
                 // Add earthquake to list of earthquakes
                 earthquakes.add(earthquake);
             }
